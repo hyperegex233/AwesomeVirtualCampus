@@ -1,0 +1,58 @@
+% !TeX root = ../introduction.tex
+\ifx\maindoc\undefined
+\errmessage{This file must be input from a main document!}
+\fi
+
+% header/header.tex
+% This file contains shared packages, configurations, and custom settings used across the project.
+% Modify with caution — changes here affect the entire document.
+
+\documentclass{article}
+\usepackage[UTF8]{ctex}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{zhlipsum}
+\usepackage{lastpage}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{paralist}
+\usepackage{booktabs}
+\usepackage{fancybox}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{lipsum} % 用于插入占位文本
+
+\let\itemize\compactitem
+\let\enditemize\endcompactitem
+\let\enumerate\compactenum
+\let\endenumerate\endcompactenum
+\let\description\compactdesc
+\let\enddescription\endcompactdesc
+
+%\setCJKmainfont{simsun.ttc}[BoldFont=simhei.ttf]
+\geometry{a4paper,left=25mm,right=20mm,top=25mm,bottom=25mm}
+
+
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95} %
+
+\lstset{
+    numbers=left,
+    keywordstyle= \color{ blue!70},
+    commentstyle= \color{red!50!green!50!blue!50},
+    rulecolor = \color{ red!20!green!20!blue!20} ,
+    escapeinside=``,
+    numberstyle=\tt,
+    numbersep=1em,
+    xleftmargin=2em,
+    breaklines,
+    aboveskip=1em,
+    framexleftmargin=3em,
+    showtabs = false, %
+    showspaces=false, %    
+    showstringspaces=false, %
+    basicstyle=\tt,
+    language=Java,
+    backgroundcolor=\color{backcolour}, %
+    fillcolor=\color{backcolour} %
+}

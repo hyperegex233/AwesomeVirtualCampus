@@ -285,7 +285,7 @@ data是一个声明为Object类型的成员，它承载了消息的实际业务�
 
 最后的sender字段记录了消息的发起方标识，通常为用户名或用户ID，用于服务端的身份验证与审计日志。通过对这些字段的组合与填充，Message类能够灵活适应从用户认证到数据同步等各类应用场景。各个关键字段所包含的特征可由下表直观展示:
 
-\begin{tabular}{llll}
+\begin{tabular}{lllll}
     \toprule
     \textbf{序号} & \textbf{名称} & \textbf{类型}    & \textbf{约束}            & \textbf{备注} \\
     \midrule
@@ -303,10 +303,8 @@ data是一个声明为Object类型的成员，它承载了消息的实际业务�
 \subsection{User}
 User类即为用户实体类，它包含了用户的ID、用户名、密码、昵称等属性，是系统核心业务实体的基础抽象，同时建模了虚拟校园环境中所有参与者的基本属性和行为。作为一个将在网络中传输并在持久化层存储的实体，它同样实现了Serializable接口。该类不仅包含了最基本的身份认证信息（如唯一标识用户的id和经过哈希加密处理的密码pwd），还包含了描述性属性如age。
 
-尤为关键的是，它通过一个role字段（通常为枚举类型，如UserRole.STUDENT, UserRole.TEACHER, UserRole.ADMIN）来实现基于角色的访问控制（RBAC），该系统权限体系的基石。在后续的设计中，考虑到不同角色用户可能存在行为与属性的差异，可以采用继承机制对User类进行拓展，派生出Student、Teacher和Administrator等子类，从而通过多态特性更精确地建模现实世界。此外，该类应遵循JavaBean规范，提供所有属性的getter和setter方法，并重写toString(), equals()和hashCode()方法，以确保其能够方便地在各种业务逻辑、数据展示及集合操作中被正确处理。
-
-其所包含的一些关键字段如下表直观可视：
-\begin{tabular}{llll}
+尤为关键的是，它通过一个role字段（通常为枚举类型，如UserRole.STUDENT, UserRole.TEACHER, UserRole.ADMIN）来实现基于角色的访问控制（RBAC），该系统权限体系的基石。在后续的设计中，考虑到不同角色用户可能存在行为与属性的差异，可以采用继承机制对User类进行拓展，派生出Student、Teacher和Administrator等子类，从而通过多态特性更精确地建模现实世界。此外，该类应遵循JavaBean规范，提供所有属性的getter和setter方法，并重写toString(), equals()和hashCode()方法，以确保其能够方便地在各种业务逻辑、数据展示及集合操作中被正确处理。其所包含的一些关键字段如下表直观可视：
+\begin{tabular}{lllll}
     \toprule
     \textbf{序号} & \textbf{名称} & \textbf{类型}    & \textbf{约束}            & \textbf{备注} \\
     \midrule

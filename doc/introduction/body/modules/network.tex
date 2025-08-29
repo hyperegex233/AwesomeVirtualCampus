@@ -8,16 +8,17 @@
 \subsection{Socket}
 Socket是网络模块中最基础的通信端点，Java原生Socket API为建立TCP连接提供了直接支持。在本暑期实训项目之中计划设计的V-Campus系统中，Socket的创建与管理策略在客户端和服务器端有着明确的区分。
 \subsubsection{客户端}
-在客户端，Socket的创建发生在其需要与服务器进行交互时。通常，会在应用程序初始化阶段或用户登录时，通过new Socket(SERVER_IP, SERVER_PORT)尝试与指定的服务器地址和端口建立连接。该连接一旦成功建立，便会被缓存并复用于该客户端会话期间后续的所有网络通信，直至用户登出或应用程序关闭时才显式关闭，以避免频繁建立和断开连接所带来的性能损耗。客户端需要负责监控此连接的状态，并在连接意外中断时触发重连机制，以保证服务的连续性。连接服务器Socket的代码片段具体如下所示：
-
-clientSocket = new Socket(SERVER_ADDRESS, SERVER_PORT);
+在客户端，Socket的创建发生在其需要与服务器进行交互时。通常，会在应用程序初始化阶段或用户登录时，通过new Socket(SERVER\_IP, SERVER\_PORT)尝试与指定的服务器地址和端口建立连接。该连接一旦成功建立，便会被缓存并复用于该客户端会话期间后续的所有网络通信，直至用户登出或应用程序关闭时才显式关闭，以避免频繁建立和断开连接所带来的性能损耗。客户端需要负责监控此连接的状态，并在连接意外中断时触发重连机制，以保证服务的连续性。连接服务器Socket的代码片段具体如下所示：
+\begin{lstlisting}
+clientSocket = new Socket(SERVER\_ADDRESS, SERVER\_PORT);
+\end{lstlisting}
 \subsubsection{服务端}
 在服务器端，Socket的使用模式则截然不同。当服务器启动时会创建一个ServerSocket实例，并绑定到指定的端口上持续监听连接请求（serverSocket = new ServerSocket(PORT)）。一旦有客户端连接请求抵达，ServerSocket的accept()方法会返回一个新的Socket实例，该实例代表了与这个特定客户端的专用通信通道。服务器端不会在此Socket上直接进行业务处理，而是会立即创建一个新的工作线程（或从线程池中分配一个），并将这个Socket交给该线程负责其整个生命周期的读写操作。
 
 这种“一个客户端一个线程”的模型（可通过线程池优化）是服务器能够同时处理成千上万个客户端连接的关键。服务器端还需要实现一个连接管理器（如ClientThreadMan），用于追踪所有活跃的客户端连接、定时进行心跳检测以判断客户端是否存活、以及在服务器关闭时统一清理所有资源。创建服务器Socket的代码片段如下所示：
-
-serverSocket = new ServerSocket(IConstant.SERVER_PORT);
-
+\begin{lstlisting}
+serverSocket = new ServerSocket(IConstant.SERVER\_PORT);
+\end{lstlisting}
 
 \subsubsection{客户端}
 客户端通信服务接口IMessageClientSrv定义了客户端所有网络操作的核心契约，它将网络通信的细节对上层业务逻辑隐藏起来，提供了一个简洁、抽象的异步消息收发模型。该接口的核心方法send(Message msg)负责将封装好的业务请求消息发送至服务器端，其内部实现会首先调用validate(Message msg)方法对待发送消息的基本有效性进行校验，例如检查目标地址是否为空、必要的载荷数据是否存在等，以防止无效请求占用网络资源。

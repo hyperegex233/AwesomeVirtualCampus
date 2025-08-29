@@ -4,37 +4,61 @@
 \fi
 
 \section{网络模块设计说明}
-网络模块主要采用Socket编程实现客户端与服务器之间的TCP长连接通信，它作为VCampus系统客户端与服务器端之间通信的基石，其设计的可靠性、高效性与安全性直接决定了整个系统的运行质量。本系统计划采用基于TCP协议的Socket通信作为远程交互的主要手段，通过自定义的应用层协议（以可序列化的Message对象为载体）在两端之间传输指令与数据。该模块的设计充分考虑了并发处理、连接管理、异常恢复与资源释放等关键问题，旨在构建一个稳定、可扩展的通信框架，以满足虚拟校园多用户实时交互的业务需求。
+本项目采用 Netty 框架处理底层网络通信，实现了一套基于 Socket 的客户端-服务器架构，它作为VCampus系统客户端与服务器端之间通信的基石，其设计的可靠性、高效性与安全性直接决定了整个系统的运行质量。通信数据使用 JSON 格式进行序列化与反序列化，通过自定义的编解码器处理请求与响应报文，旨在构建一个稳定、可扩展的通信框架，以满足虚拟校园多用户实时交互的业务需求。
+
 \subsection{Socket}
 Socket是网络模块中最基础的通信端点，Java原生Socket API为建立TCP连接提供了直接支持。在本暑期实训项目之中计划设计的V-Campus系统中，Socket的创建与管理策略在客户端和服务器端有着明确的区分。
-\subsubsection{客户端}
-在客户端，Socket的创建发生在其需要与服务器进行交互时。通常，会在应用程序初始化阶段或用户登录时，通过new Socket(SERVER\_IP, SERVER\_PORT)尝试与指定的服务器地址和端口建立连接。该连接一旦成功建立，便会被缓存并复用于该客户端会话期间后续的所有网络通信，直至用户登出或应用程序关闭时才显式关闭，以避免频繁建立和断开连接所带来的性能损耗。客户端需要负责监控此连接的状态，并在连接意外中断时触发重连机制，以保证服务的连续性。连接服务器Socket的代码片段具体如下所示：
-\begin{lstlisting}
-clientSocket = new Socket(SERVER\_ADDRESS, SERVER\_PORT);
-\end{lstlisting}
-\subsubsection{服务端}
-在服务器端，Socket的使用模式则截然不同。当服务器启动时会创建一个ServerSocket实例，并绑定到指定的端口上持续监听连接请求（serverSocket = new ServerSocket(PORT)）。一旦有客户端连接请求抵达，ServerSocket的accept()方法会返回一个新的Socket实例，该实例代表了与这个特定客户端的专用通信通道。服务器端不会在此Socket上直接进行业务处理，而是会立即创建一个新的工作线程（或从线程池中分配一个），并将这个Socket交给该线程负责其整个生命周期的读写操作。
+\subsubsection{客户端实现}
+本项目计划将客户端通过封装好的 Socket 客户端类建立与服务器的长连接，支持发送请求并异步接收响应，内部自动处理连接重试和异常断开。
 
-这种“一个客户端一个线程”的模型（可通过线程池优化）是服务器能够同时处理成千上万个客户端连接的关键。服务器端还需要实现一个连接管理器（如ClientThreadMan），用于追踪所有活跃的客户端连接、定时进行心跳检测以判断客户端是否存活、以及在服务器关闭时统一清理所有资源。创建服务器Socket的代码片段如下所示：
-\begin{lstlisting}
-serverSocket = new ServerSocket(IConstant.SERVER\_PORT);
-\end{lstlisting}
+在客户端，Socket的创建发生在其需要与服务器进行交互时。通常，会在应用程序初始化阶段或用户登录时，通过new Socket尝试与指定的服务器地址和端口建立连接。该连接一旦成功建立，便会被缓存并复用于该客户端会话期间后续的所有网络通信，直至用户登出或应用程序关闭时才显式关闭，以避免频繁建立和断开连接所带来的性能损耗。客户端需要负责监控此连接的状态，并在连接意外中断时触发重连机制，以保证服务的连续性。
+\subsubsection{服务端\textbf{NettyServer}实现}
+服务器端主要基于Netty-NIO框架构建，负责监听指定端口、接收客户端连接、处理网络I/O事件并分发业务请求。其核心设计与功能如下：
+\begin{enumerate}
+    \item 采用主从Reactor线程模型，bossGroup线程组负责接受新连接，workerGroup线程组负责处理已建立连接的I/O操作，有效提升并发处理能力。
+    \item 通过ServerBootstrap类进行启动配置，初始化通道管道（Pipeline），指定编解码器及业务处理器。
+    \item 提供run(router, database)方法，接收全局路由管理器（Router）及数据库会话等依赖项后启动服务。
+\end{enumerate}
 
-\subsubsection{客户端}
-客户端通信服务接口IMessageClientSrv定义了客户端所有网络操作的核心契约，它将网络通信的细节对上层业务逻辑隐藏起来，提供了一个简洁、抽象的异步消息收发模型。该接口的核心方法send(Message msg)负责将封装好的业务请求消息发送至服务器端，其内部实现会首先调用validate(Message msg)方法对待发送消息的基本有效性进行校验，例如检查目标地址是否为空、必要的载荷数据是否存在等，以防止无效请求占用网络资源。
-
-发送过程通常采用异步非阻塞模式，以避免阻塞用户界面主线程，确保客户端操作的流畅性。与之对应的是消息的接收机制，尽管在严格的接口定义中可能不直接暴露给业务层，但底层通信线程会持续监听来自服务器端的响应，并通过回调机制或事件驱动模型（如观察者模式）将收到的Message对象传递给相应的业务处理器进行处理。
-
-整个通信生命周期内的连接建立、重试逻辑、超时控制以及安全认证（如SSL/TLS握手）都封装在该接口的实现类之中，使得业务开发人员能够专注于功能实现，而无需关心底层的网络复杂性。
-\subsubsection{服务器端 \texttt{NettyServer}}
-服务器端通信服务接口IMessageServerSrv则承担着更为艰巨的任务，它需要管理所有客户端的连接请求、并发处理海量的并发消息并将其路由至正确的业务逻辑单元。其start()方法是服务器启动的入口，负责初始化服务器Socket、创建线程池以及启动监听线程，从而进入等待客户端连接的状态。与之相对的stop()或shutdown()方法则用于优雅地关闭服务，它会拒绝新的连接请求，同时等待所有已连接的客户端处理完毕当前任务后再释放资源，确保数据的一致性。
-
-与客户端类似，它也提供了send(Message msg, Socket clientSocket)方法用于向特定客户端发送响应消息，以及broadcast(Message msg)方法用于向所有在线客户端进行广播推送，这在通知类场景中尤为有用。服务器端的receive操作并非一个主动调用的方法，而是由每个客户端连接专属的处理线程循环执行的，它们不断地从Socket输入流中读取Message对象。随后，服务器会根据消息头中的类型（type）和状态码（statusCode），利用责任链模式或命令模式将其分派给预先注册的、专门处理该类消息的MessageHandler进行处理，从而实现请求的精确路由与业务的解耦。
 \subsection{输入输出流}
-建立在Socket连接之上的输入输出流是实现Java对象传输的直接媒介。本项目所设计的VCampus系统计划采用ObjectInputStream和ObjectOutputStream来序列化和反序列化Message对象，从而在网络上传输复杂的对象图。使用 "ObjectInputStream" 和 "ObjectOutputStream" 来序列化和反序列化 "Message" 对象，从而实现在网络中进行传输。
+在本系统中，所有网络通信均基于Netty框架实现，通过自定义的编解码器处理请求与响应数据的序列化与反序化。输入输出流的处理是网络通信层的核心部分，确保数据能够正确、高效地在客户端与服务器之间传输。
 \subsubsection{读取输入}
-读取输入数据的过程始于持续监听Socket的输入流。当发送方有数据传来时，接收方会调用ObjectInputStream ois = new ObjectInputStream(socket.getInputStream())来获取对象输入流，随后通过Message msg = (Message) ois.readObject()方法调用阻塞性地读取一个完整的Message对象。这个过程必须是线程安全的，并且通常被放置在一个独立的循环中，以便连续处理来自对端的多个消息。必须注意处理ClassNotFoundException和InvalidClassException等异常，这些异常通常表明客户端与服务器端的类定义（特别是Message及其中data载荷的类）版本不一致，这是分布式系统开发中需要严格管理的问题。
-\subsubsection{发送输出}
-发送输出数据的过程与读取输入的过程是相对的。首先，发送方要获取Socket的输出流并创建对象输出流：ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream())。期中需要注意的是，为了避免潜在的字节顺序标记（BOM）问题，一个Socket连接上的ObjectOutputStream应该只被创建一次并重复使用。
+Netty通过ChannelPipeline机制对输入流进行处理。服务器启动时，我们在Pipeline中配置了自定义的处理器，主要包括：
+\begin{enumerate}
+    \item \textbf{JsonObjectDecoder：}用于将接收到的字节流按JSON格式进行解码，解析为可操作的Java对象
+    \item \textbf{NettyHandler：}继承自ChannelInboundHandlerAdapter，负责处理解码后的请求对象。在其channelRead方法中，我们对请求进行路由匹配、权限校验，并调用相应的业务逻辑处理单元。
+\end{enumerate}
+以下为主要处理流程的处理代码：
+\begin{lstlisting}
+EventLoopGroup bossGroup = new NioEventLoopGroup();
+EventLoopGroup workerGroup = new NioEventLoopGroup();
+try {
+    ServerBootstrap b = new ServerBootstrap();
+    b.group(bossGroup, workerGroup)
+        .channel(NioServerSocketChannel.class)
+        .childHandler(new ChannelInitializer<SocketChannel>() {
+            @Override
+            public void initChannel(@NonNull SocketChannel ch) {
+                ch.pipeline().addLast(new JsonObjectDecoder())
+                            .addLast(new NettyHandler(router));
+            }
+        })
+        .option(ChannelOption.SO_BACKLOG, 128)
+        .childOption(ChannelOption.SO_KEEPALIVE, true);
+    ChannelFuture f = b.bind(port).sync();
+    f.channel().closeFuture().sync();
+} finally {
+    workerGroup.shutdownGracefully();
+    bossGroup.shutdownGracefully();
+}
+\end{lstlisting}
+在NettyHandler的channelRead方法中，我们对请求对象进行进一步处理，包括路由查找、会话管理和权限判断，最终将请求分发给相应的Controller进行处理，并生成响应结果。
 
-之后，通过oos.writeObject(message)方法将封装好的Message对象序列化并写入输出流。为了确保数据被立即发送出去而不是缓冲在本地，通常在写入操作后需要调用oos.flush()方法。最后，必须妥善处理IOException，例如当网络连接已断开时，写入操作会失败，此时需要触发相应的错误处理逻辑，如尝试重连或通知上层业务逻辑发送失败。
+\subsubsection{发送输出}
+处理完成后，服务器通过ChannelHandlerContext将响应对象写回客户端。我们使用Gson将Response对象序列化为JSON字符串，再通过Netty的Channel写入通道，最终发送至客户端。关键发送代码如下：
+\begin{lstlisting}
+    private void sendResponse(ChannelHandlerContext ctx, Response response) {
+    ctx.writeAndFlush(Unpooled.copiedBuffer(gson.toJson(response), CharsetUtil.UTF_8));
+}
+\end{lstlisting}
+该过程可确保响应数据以UTF-8编码的JSON格式通过网络传回客户端，从而最终完成一次完整的请求-响应交互。

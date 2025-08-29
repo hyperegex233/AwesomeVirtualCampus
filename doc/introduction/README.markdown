@@ -45,7 +45,5 @@
 
 - 请确保所有的图片都在`/fig`下！每一个特定的 `.tex` 文件下所用到的图片都应当有**独一无二的文件名前缀**（推荐直接用自己所编辑文件的文件名）。
   比方说， `introduction.tex` 中插入的图片都应命名为 `introduction_xxxx.pdf/png` 
-  
-- 编译技巧：有时，可尝试编译`/header/header.tex`，再编译 `introduction.tex`
 
 - 若要插入图片和代码块，请参考 `/example`内的文件！

@@ -17,10 +17,3 @@
 本工具类则负责用户密码的加密和验证。本项目计划采用  BCrypt 算法来对明文密码进行哈希处理，设置成本因子，生成随机盐值后使用EksBlowfish 算法计算生成最终的哈希字符串，同时在程序之中使用verify() 方法用于校验传入的密码是否与存储的哈希值匹配。
 \subsubsection{数据库工具类DbHelper}
 这个工具类主要封装了数据库连接及会话管理的基本操作，其提供了一个静态方法 init() 用于初始化数据库连接并返回 Hibernate 的 Session 对象，避免在各处重复编写连接代码。
-
-% \subsection{Message}
-% \subsection{User}
-% \subsection{数据库工具类DbHelper}
-% \subsection{数据存取类DAO}
-% \subsection{工具类}
-% \subsection{其他类}

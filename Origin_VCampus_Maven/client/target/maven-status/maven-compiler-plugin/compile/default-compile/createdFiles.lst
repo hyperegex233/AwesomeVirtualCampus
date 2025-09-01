@@ -1,0 +1,14 @@
+app\vcampus\client\gateway\AdminClient.class
+app\vcampus\client\net\NettyClient$1.class
+app\vcampus\client\gateway\AuthClient.class
+app\vcampus\client\gateway\FinanceClient.class
+app\vcampus\client\gateway\StudentStatusClient.class
+app\vcampus\client\Launcher.class
+app\vcampus\client\net\NettyHandler.class
+app\vcampus\client\Main.class
+app\vcampus\client\gateway\BaseClient.class
+app\vcampus\client\Application.class
+app\vcampus\client\gateway\LibraryClient.class
+app\vcampus\client\gateway\StoreClient.class
+app\vcampus\client\gateway\TeachingAffairsClient.class
+app\vcampus\client\net\NettyClient.class

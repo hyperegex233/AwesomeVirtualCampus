@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
-public class LibraryClient {
+public class LibraryClient extends BaseClient {
     public static LibraryBook preAddBook(NettyHandler handler, String isbn) {
         Request request = new Request();
         request.setUri("library/isbn");

@@ -3,27 +3,26 @@ package app.vcampus.client.net;
 import app.vcampus.server.utility.Request;
 import app.vcampus.server.utility.Response;
 import com.google.gson.Gson;
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.CharsetUtil;
-import io.netty.util.ReferenceCountUtil;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
 /**
  * NettyHandler class.
  */
 @Slf4j
-public class NettyHandler extends ChannelInboundHandlerAdapter {
+public class NettyHandler extends SimpleChannelInboundHandler<String> {
     private final Gson gson = new Gson();
     private final Map<UUID, Consumer<Response>> callbacks = new HashMap<>();
+    private final CountDownLatch connectionLatch = new CountDownLatch(1);
     private ChannelHandlerContext ctx;
 
     /**
@@ -35,6 +34,7 @@ public class NettyHandler extends ChannelInboundHandlerAdapter {
     public void channelActive(ChannelHandlerContext ctx) {
         log.info("[{}] Connected", ctx.channel().id());
         this.ctx = ctx;
+        connectionLatch.countDown();
     }
 
     /**
@@ -48,17 +48,10 @@ public class NettyHandler extends ChannelInboundHandlerAdapter {
         this.ctx = null;
     }
 
-    /**
-     * Called when a message is received.
-     *
-     * @param ctx The channel handler context.
-     * @param msg The message.
-     */
     @Override
-    public void channelRead(@NonNull ChannelHandlerContext ctx, @NonNull Object msg) {
-        ByteBuf in = (ByteBuf) msg;
+    protected void channelRead0(ChannelHandlerContext ctx, String msg) {
         try {
-            Response response = gson.fromJson(in.toString(CharsetUtil.UTF_8), Response.class);
+            Response response = gson.fromJson(msg, Response.class);
             if (!callbacks.containsKey(response.getId())) {
                 throw new IllegalStateException("Callback not found");
             }
@@ -66,8 +59,6 @@ public class NettyHandler extends ChannelInboundHandlerAdapter {
             callbacks.remove(response.getId());
         } catch (Exception e) {
             log.error("[{}] Exception: {}", ctx.channel().id(), e.getMessage());
-        } finally {
-            ReferenceCountUtil.release(msg);
         }
     }
 
@@ -78,6 +69,14 @@ public class NettyHandler extends ChannelInboundHandlerAdapter {
      * @param callback The callback.
      */
     public void sendRequest(Request request, Consumer<Response> callback) {
+        try {
+            connectionLatch.await();
+        } catch (InterruptedException e) {
+            log.error("Waiting for connection interrupted", e);
+            Thread.currentThread().interrupt();
+            return;
+        }
+
         if (ctx == null) {
             throw new IllegalStateException("Channel not connected");
         }

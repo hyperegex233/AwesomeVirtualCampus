@@ -6,9 +6,11 @@ import app.vcampus.server.utility.Request;
 import app.vcampus.server.utility.Response;
 import app.vcampus.server.utility.Session;
 import app.vcampus.server.utility.router.RouteMapping;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
+@Slf4j
 public class AuthController {
     /**
      * for user to log in by cardNumber and password
@@ -28,7 +30,9 @@ public class AuthController {
             }
 
             User user = database.get(User.class, Integer.parseInt(cardNum));
-            if (user == null || !Password.verify(password, user.getPassword())) {
+            boolean passwordCorrect = user != null && Password.verify(password, user.getPassword());
+            log.info("Password verification for user {} result: {}", cardNum, passwordCorrect);
+            if (!passwordCorrect) {
                 return Response.Common.error("Incorrect card number or password");
             }
             user.setPassword(null);

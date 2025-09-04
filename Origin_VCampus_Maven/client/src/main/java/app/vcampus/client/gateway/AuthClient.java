@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Map;
 
 @Slf4j
-public class AuthClient {
+public class AuthClient extends BaseClient {
     public static User login(NettyHandler handler, String username, String password) {
         Request request = new Request();
         request.setUri("auth/login");

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-public class AdminClient {
+public class AdminClient extends BaseClient {
     public static Boolean addUser(NettyHandler handler, User user) {
         Request request = new Request();
         request.setUri("admin/user/add");

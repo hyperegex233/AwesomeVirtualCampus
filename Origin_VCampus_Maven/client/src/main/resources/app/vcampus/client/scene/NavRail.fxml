@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:controller="app.vcampus.client.scene.NavRailController" alignment="TOP_CENTER" prefWidth="200.0" spacing="10.0" style="-fx-background-color: #F5F5F5;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+    <padding>
+        <Insets top="20.0" />
+    </padding>
+    <children>
+        <JFXButton fx:id="homeButton" onAction="#handleHome" prefHeight="40.0" prefWidth="160.0" styleClass="nav-button" text="主页" />
+        <JFXButton fx:id="studentStatusButton" onAction="#handleStudentStatus" prefHeight="40.0" prefWidth="160.0" styleClass="nav-button" text="学籍" />
+        <JFXButton fx:id="teachingAffairsButton" onAction="#handleTeachingAffairs" prefHeight="40.0" prefWidth="160.0" styleClass="nav-button" text="教务" />
+        <JFXButton fx:id="libraryButton" onAction="#handleLibrary" prefHeight="40.0" prefWidth="160.0" styleClass="nav-button" text="图书馆" />
+        <JFXButton fx:id="shopButton" onAction="#handleShop" prefHeight="40.0" prefWidth="160.0" styleClass="nav-button" text="超市" />
+        <JFXButton fx:id="financeButton" onAction="#handleFinance" prefHeight="40.0" prefWidth="160.0" styleClass="nav-button" text="财务" />
+        <JFXButton fx:id="adminButton" onAction="#handleAdmin" prefHeight="40.0" prefWidth="160.0" styleClass="nav-button" text="管理员" />
+        <JFXButton fx:id="gptButton" onAction="#handleGpt" prefHeight="40.0" prefWidth="160.0" styleClass="nav-button" text="GPT" />
+    </children>
+</VBox>

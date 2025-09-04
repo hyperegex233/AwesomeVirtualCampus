@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class FinanceClient {
+public class FinanceClient extends BaseClient {
     public static FinanceCard getMyCard(NettyHandler handler) {
         Request request = new Request();
         request.setUri("finance/card/getSelf");

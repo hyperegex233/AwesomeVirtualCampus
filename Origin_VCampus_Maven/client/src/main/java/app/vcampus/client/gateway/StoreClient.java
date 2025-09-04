@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.*;
 
 @Slf4j
-public class StoreClient {
+public class StoreClient extends BaseClient {
     public static Boolean buyItems(NettyHandler handler, List<Pair<UUID, Integer>> items) {
         Request request = new Request();
         request.setUri("store/buy");

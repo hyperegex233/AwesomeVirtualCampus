@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXPasswordField?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<StackPane fx:controller="app.vcampus.client.scene.LoginScene" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1064.0" style="-fx-background-color: #FFFFFF;" stylesheets="@login.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+         <children>
+            <ImageView fitHeight="600.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="/images/seu-side.png" />
+               </image>
+            </ImageView>
+            <StackPane prefHeight="600.0" prefWidth="464.0">
+               <children>
+                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="16.0">
+                     <padding>
+                        <Insets left="68.0" right="68.0" />
+                     </padding>
+                     <children>
+                        <VBox alignment="CENTER_LEFT">
+                           <children>
+                              <Label text="统一认证登录">
+                                 <font>
+                                    <Font name="System Bold" size="24.0" />
+                                 </font>
+                              </Label>
+                              <Label text="VCampus">
+                                 <font>
+                                    <Font size="18.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </VBox>
+                        <JFXTextField fx:id="usernameField" focusColor="#007bff" labelFloat="true" promptText="一卡通号" />
+                        <StackPane>
+                           <JFXPasswordField fx:id="passwordField" focusColor="#007bff" labelFloat="true" promptText="密码" />
+                           <JFXTextField fx:id="passwordTextField" focusColor="#007bff" labelFloat="true" managed="false" promptText="密码" visible="false" />
+                           <JFXButton fx:id="togglePasswordButton" onAction="#togglePasswordVisibility" styleClass="text-button" text="显示" StackPane.alignment="CENTER_RIGHT">
+                              <StackPane.margin>
+                                 <Insets right="8.0" />
+                              </StackPane.margin>
+                           </JFXButton>
+                        </StackPane>
+                        <JFXTextField fx:id="serverAddressField" managed="false" promptText="服务器地址" visible="false" />
+                        <HBox alignment="CENTER" prefHeight="30.0" prefWidth="328.0">
+                           <children>
+                              <JFXButton styleClass="text-button" text="忘记密码？" />
+                              <JFXButton onAction="#handleSetServerAddress" styleClass="text-button" text="设置服务器地址" />
+                              <Region HBox.hgrow="ALWAYS" />
+                              <JFXButton fx:id="loginButton" onAction="#handleLogin" buttonType="RAISED" prefHeight="40.0" prefWidth="100.0" style="-fx-background-color: #007BFF; -fx-text-fill: white;" text="登录" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+            </StackPane>
+         </children>
+      </HBox>
+   </children>
+</StackPane>

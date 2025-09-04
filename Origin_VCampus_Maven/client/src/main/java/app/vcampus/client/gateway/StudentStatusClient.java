@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-public class StudentStatusClient {
+public class StudentStatusClient extends BaseClient {
     /*
     Used to search Student's information
     @@param keyword -- search keyword

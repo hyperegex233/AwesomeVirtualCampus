@@ -9,13 +9,12 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.json.JsonObjectDecoder;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Callable;
 
-/**
- * NettyClient class.
- */
 public class NettyClient implements Callable<NettyHandler> {
     private static final EventLoopGroup workerGroup = new NioEventLoopGroup();
     private final String host;
@@ -26,11 +25,6 @@ public class NettyClient implements Callable<NettyHandler> {
         this.port = port;
     }
 
-    /**
-     * Connect to a server.
-     *
-     * @return The netty handler.
-     */
     @Override
     public NettyHandler call() {
         try {
@@ -43,11 +37,10 @@ public class NettyClient implements Callable<NettyHandler> {
             b.handler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 public void initChannel(@NotNull SocketChannel ch) throws Exception {
-                    ch.pipeline().addLast(new JsonObjectDecoder()).addLast(handler);
+                    ch.pipeline().addLast(new JsonObjectDecoder()).addLast(new StringEncoder()).addLast(new StringDecoder()).addLast(handler);
                 }
             });
 
-            // Start the client.
             ChannelFuture f = b.connect(host, port).syncUninterruptibly();
 
             return handler;

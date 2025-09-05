@@ -19,8 +19,10 @@ public class Database {
      *
      * @return The SessionFactory.
      */
-    public static SessionFactory init() {
+    public static SessionFactory init(String DB_USERNAME , String DB_PASSWORD) {
         Configuration configuration = new Configuration().configure();
+        configuration.setProperty("hibernate.connection.username", DB_USERNAME);
+        configuration.setProperty("hibernate.connection.password", DB_PASSWORD);
         return configuration
                 .addAnnotatedClass(User.class)
                 .addAnnotatedClass(Student.class)

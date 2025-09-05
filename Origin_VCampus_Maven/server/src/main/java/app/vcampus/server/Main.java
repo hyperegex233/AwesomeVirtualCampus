@@ -10,6 +10,10 @@ import app.vcampus.server.utility.router.Router;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
+import java.io.Console;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -25,6 +29,9 @@ Main {
      * @param args Command line arguments.
      * @throws Exception Any exception that may occur.
      */
+    private static String DB_USERNAME;
+    private static String DB_PASSWORD;
+
     public static void main(String[] args) throws Exception {
         Router router = new Router();
         router.addController(AuthController.class);
@@ -36,7 +43,18 @@ Main {
         router.addController(FinanceController.class);
         router.addController(AdminController.class);
 
-        SessionFactory databaseFactory = Database.init();
+        // 读取数据库用户名 & 密码
+        Console console = System.console();
+        if (console == null) {
+            System.err.println("❌ 控制台不可用。请在终端中运行此程序！");
+            System.exit(-1);
+        }
+        DB_USERNAME = console.readLine("Enter database username: ");
+        // 读取密码（输入不会显示）
+        char[] passwordChars = console.readPassword("database password:");
+        DB_PASSWORD = new String(passwordChars);
+
+        SessionFactory databaseFactory = Database.init(DB_USERNAME, DB_PASSWORD);
         org.hibernate.Session database = databaseFactory.openSession();
 
 //        String text = formatter.format(date);

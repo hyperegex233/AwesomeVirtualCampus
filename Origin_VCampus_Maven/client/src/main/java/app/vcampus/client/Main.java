@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -23,16 +24,18 @@ public class Main extends Application {
     public static void showLogin() throws IOException {
         Parent root = FXMLLoader.load(Objects.requireNonNull(Main.class.getResource("/app/vcampus/client/scene/LoginScene.fxml")));
         primaryStage.setTitle("VCampus Login");
-        primaryStage.setScene(new Scene(root, 1064, 600));
+        primaryStage.setScene(new Scene(root, 400, 600));
         primaryStage.show();
+        primaryStage.requestFocus();
     }
 
     public static void showMainPanel() throws IOException {
         Parent root = FXMLLoader.load(Objects.requireNonNull(Main.class.getResource("/app/vcampus/client/scene/MainPanel.fxml")));
         primaryStage.setTitle("VCampus");
+        // Directly set the new size and scene
         primaryStage.setScene(new Scene(root, 1400, 800));
-        primaryStage.setResizable(true);
         primaryStage.centerOnScreen();
+        primaryStage.requestFocus();
     }
 
     public static void main(String[] args) {

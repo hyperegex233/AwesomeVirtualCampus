@@ -85,4 +85,10 @@ public class NettyHandler extends SimpleChannelInboundHandler<String> {
         ctx.writeAndFlush(Unpooled.copiedBuffer(gson.toJson(request), CharsetUtil.UTF_8));
     }
 
+    public void disconnect() {
+        if (ctx != null) {
+            ctx.close();
+        }
+    }
+
 }

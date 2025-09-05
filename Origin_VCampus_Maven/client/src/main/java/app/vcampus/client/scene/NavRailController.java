@@ -3,10 +3,17 @@ package app.vcampus.client.scene;
 import javafx.fxml.FXML;
 
 public class NavRailController {
+    private MainPanelController mainPanelController;
+    public void setMainPanelController(MainPanelController mainPanelController) {
+        this.mainPanelController = mainPanelController;
+    }
 
     @FXML
     private void handleHome() {
         System.out.println("Home button clicked");
+        if (mainPanelController != null) {
+            mainPanelController.loadContent("/app/vcampus/client/scene/sub/HomeView.fxml");
+        }
     }
 
     @FXML

@@ -31,6 +31,7 @@ public class Main extends Application {
         Parent root = FXMLLoader.load(Objects.requireNonNull(Main.class.getResource("/app/vcampus/client/scene/MainPanel.fxml")));
         primaryStage.setTitle("VCampus");
         primaryStage.setScene(new Scene(root, 1400, 800));
+        primaryStage.setResizable(true);
         primaryStage.centerOnScreen();
     }
 

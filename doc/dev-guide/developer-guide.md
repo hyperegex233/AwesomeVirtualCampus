@@ -40,13 +40,19 @@ git clone https://github.com/zeroffa233/AwesomeVirtualCampus.git
 
 可参考 Client 的配置方法，配置一个 `Maven` 选项，“运行”一栏填 `package`，工作目录为`vcampus-server`，
 
-Serevr 是一个**命令行**程序，**请在终端中运行**。若在 `IDEA` 中尝试运行 Server ，会提示 “控制台不可用。请在终端中运行此程序！”。
+> [!IMPORTANT]
+>
+> Serevr 是一个**命令行**程序，**请在终端中运行**。若在 `IDEA` 中尝试运行 Server ，会提示 “控制台不可用。请在终端中运行此程序！”。
 
 ```bash
 java -jar path/vcampus-server-1.0.0.jar #请将这里的path替换为正确的路径
 ```
 
-在尝试运行 Server 之前，请确保启动了 MySQL Server 并配置好数据库。以下是相关命令
+> [!IMPORTANT]
+>
+> 在尝试运行 Server 之前，请确保启动了 MySQL Server 并配置好数据库。
+
+以下是相关命令
 
 ```bash
 mysql -u root -p
@@ -58,3 +64,20 @@ mysql -u root -p
 mysql> USE vcampus;
 mysql> SHOW TABLES;
 ```
+
+## 可能存在的问题
+
+### Q：为什么打包后，`/target` 文件夹下会有两个 `.jar` 包？
+
+> [!NOTE]
+>
+> 本节内容由 AI 辅助生成
+
+A：因为项目中使用了 **maven-shade-plugin** 插件，该插件会创建一个**包含所有依赖**的可执行“胖” JAR。Maven 默认插件创建的、**不包含依赖**的原始 JAR会带有`origin`前缀。
+
+> maven-shade-plugin 的工作流程如下：
+>
+> 1. **默认打包**：在 Maven 的 package生命周期阶段，maven-jar-plugin 会首先被触发。它会根据您项目的 src/main/java和 src/main/resources 目录，创建一个标准的、只包含您自己项目代码的 JAR 包。此时，这个包的名字是 vcampus-client-1.0.0.jar。
+> 2. **Shade 插件执行**：紧接着，您配置的 maven-shade-plugin 会在同一个 package 阶段运行。它的目标（shade）是创建一个包含所有依赖的“胖”JAR（Uber JAR）。
+> 3. **重命名与替换**：Shade 插件会拿起第 1 步中生成的那个标准 JAR，并将您项目的所有依赖项（如 netty, gson, javafx 等）解压并合并进去。为了不丢失最原始的那个标准 JAR，Shade 插件会**将其重命名为 original-vcampus-client-1.0.0.jar**。
+> 4. **生成最终产物**：最后，Shade 插件将合并了所有内容的新“胖”JAR 保存为项目的主要构建产物，并使用原始名称 vcampus-client-1.0.0.jar。

@@ -41,7 +41,7 @@ public class NavRailController {
     @FXML
     private void handleFinance() {
         System.out.println("Finance button clicked");
-        // mainPanelController.loadView("/app/vcampus/client/scene/subscene/FinanceView.fxml");
+        mainPanelController.loadView("/app/vcampus/client/scene/sub/FinanceView.fxml");
     }
 
     @FXML
@@ -53,6 +53,6 @@ public class NavRailController {
     @FXML
     private void handleGpt() {
         System.out.println("GPT button clicked");
-        // mainPanelController.loadView("/app/vcampus/client/scene/subscene/GptView.fxml");
+        mainPanelController.loadView("/app/vcampus/client/scene/sub/GptView.fxml");
     }
 }

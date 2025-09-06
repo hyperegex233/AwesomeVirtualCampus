@@ -57,6 +57,7 @@ public class FinanceController implements Initializable {
         //TODO: 真正的请求并等待结果
         balance += Double.parseDouble(rechargeAmountField.getText());
         updateBalanceLabel();
+        rechargeAmountField.clear();
     }
 
     private void generateAndDisplayQRCode(String data) {
